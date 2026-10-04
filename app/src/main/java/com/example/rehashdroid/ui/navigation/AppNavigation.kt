@@ -20,18 +20,15 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.compose.rememberNavController
 
 @Composable
-@Preview
-fun AppNavigation(
-    modifier: Modifier = Modifier
-) {
+@Preview(showBackground = true)
+fun AppNavigation() {
     val navController = rememberNavController()
     val startDestination = Destination.HashText
     var selectedDestination by rememberSaveable { mutableIntStateOf(startDestination.ordinal) }
 
-    Scaffold(modifier = modifier) { contentPadding ->
+    Column() {
         PrimaryTabRow(
             selectedTabIndex = selectedDestination,
-            modifier = Modifier.padding(contentPadding)
         ) {
             Destination.entries.forEachIndexed { index, destination ->
                 Tab(
