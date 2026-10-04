@@ -143,7 +143,7 @@ fun CompareHash(modifier: Modifier = Modifier) {
             // Answer
             Row(
                 modifier =  Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.Start
+                horizontalArrangement = Arrangement.Center
             ) {
                 if (identicalHashes) {
                     Log.d("TAG", "identical text")
