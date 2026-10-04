@@ -1,6 +1,5 @@
-<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Hash Droid</string>
+    <string name="app_name">ReHash Droid</string>
     <string name="tab_text">Hash a text</string>
     <string name="tab_file">Hash a file</string>
     <string name="tab_compare">Compare hashes</string>
@@ -28,17 +27,17 @@
     <string name="label_menu_help">Help</string>
     <string name="selectedfile_confirmation">Do you want to compute the file %1$s ?</string>
     <string name="selectedfile_error">%1$s cannot be read!</string>
-    <string name="version">Version</string>
+    <string name="version">Version 4.3</string>
     <string name="copyright">Copyright © 2010&#8211;2019 Christophe Bouyer (Hobby One)</string>
     <string name="LicenseTitle">Licensed under the GPLv3</string>
     <string name="License">This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU General Public License as published by
-    the Free Software Foundation, either version 3 of the License, or
-    (at your option) any later version.\nThis program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License
-    along with this program. If not, see http://www.gnu.org/licenses/</string>
+        it under the terms of the GNU General Public License as published by
+        the Free Software Foundation, either version 3 of the License, or
+        (at your option) any later version.\nThis program is distributed in the hope that it will be useful,
+        but WITHOUT ANY WARRANTY; without even the implied warranty of
+        MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+        GNU General Public License for more details.\nYou should have received a copy of the GNU General Public License
+        along with this program. If not, see http://www.gnu.org/licenses/</string>
     <string name="contact">hobbyone.droid@gmail.com</string>
     <string name="AlgoList">Select a hash function:</string>
     <string name="Calculating">Calculating&#8230;</string>
