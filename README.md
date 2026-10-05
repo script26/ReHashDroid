@@ -1,4 +1,4 @@
-ReHashDroid BETA*
+ReHashDroid (Fully Working)
 
 Jetpack Compose and Kotlin remake of [Hash Droid](https://github.com/HobbyOneDroid/HashDroid)
 
