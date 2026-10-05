@@ -225,21 +225,22 @@ fun HashFile() {
                 ) {
                     var byteMathStop = false
                     var dataSize = "B"
+                    var dataSizeNum = fileSize
                     while (!byteMathStop) {
-                        if (dataSize == "GB" || fileSize < 1000) {
+                        if (dataSize == "GB" || dataSizeNum < 1000) {
                             Text(
-                                text = ("Size: $fileSize$dataSize")
+                                text = ("Size: $dataSizeNum$dataSize")
                             )
                             byteMathStop = true
                         } else {
                             if (dataSize == "B") {
-                                fileSize /= 1000
+                                dataSizeNum /= 1000
                                 dataSize = "KB"
                             } else if (dataSize == "KB") {
-                                fileSize /= 1000
+                                dataSizeNum /= 1000
                                 dataSize = "MB"
                             } else {
-                                fileSize /= 1000
+                                dataSizeNum /= 1000
                                 dataSize = "GB"
                             }
                         }
