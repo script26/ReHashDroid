@@ -2,7 +2,9 @@ package com.example.rehashdroid.ui.screens
 
 import android.content.ClipData
 import android.content.ClipboardManager
+import android.content.Context
 import android.database.Cursor
+import android.net.Uri
 import android.provider.OpenableColumns
 import android.util.Log
 import android.widget.Toast
@@ -46,26 +48,26 @@ import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import com.example.rehashdroid.R
 import com.example.rehashdroid.logic.HashFunctionOperator
+import java.io.ByteArrayInputStream
+import java.io.IOException
 import java.io.InputStream
 
-
-const val PICK_PDF_FILE = 2
 
 private var answer = "testing"
 private val hashOpe = HashFunctionOperator()
 private var msToHash = ""
-
 private var fileSize: Long = 0L
-private var filePath: String = ""
 private var fileName: String = ""
-private var stream: Any = ""
+private var fileContent: InputStream = ByteArrayInputStream(ByteArray(0))
+private var fileUri: Uri = "".toUri()
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 @Preview(showBackground = true)
-fun HashFile(modifier: Modifier = Modifier) {
+fun HashFile() {
     var checked by remember { mutableStateOf(false) }
     val options = stringArrayResource(R.array.Algo_Array)
     val hashFunction = rememberTextFieldState(
@@ -84,60 +86,19 @@ fun HashFile(modifier: Modifier = Modifier) {
     val pickFileLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.GetContent()
     ) { uri ->
-        /*if (textUri != null) {
-            // Update the state with the Uri
-            textUriState = textUri.toString()
-            Log.d("TAG", textUriState)
-        }*/
-        val item = ctx.contentResolver.openInputStream(uri!!)
-        val bytes = item?.readBytes()
-        //val length: Int = item!!.available()
-        //val displayName: String = item.fileName()
+        if (uri != null) {
+            fileUri = uri
+        }
 
-        //val cursor: Cursor? = getContentResolver().query(uri, null, null, null, null)
-        //val displayName = File(uri).name
-        val metaCursor: Cursor? = ctx.contentResolver.query(uri, null, null, null, null)
+        val metaCursor: Cursor? = ctx.contentResolver.query(fileUri, null, null, null, null)
         metaCursor?.moveToFirst()
-        val path = metaCursor?.getString(0)
-        val lengthIndex = metaCursor?.getColumnIndex(OpenableColumns.SIZE)
-        val displayNameIndex = metaCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
-        val length = metaCursor?.getLong(lengthIndex!!)
-        val displayName = metaCursor?.getString(displayNameIndex!!)
+        val fileSizeIndex = metaCursor?.getColumnIndex(OpenableColumns.SIZE)
+        val fileNameIndex = metaCursor?.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+        fileSize = metaCursor?.getLong(fileSizeIndex!!)!!
+        fileName = metaCursor.getString(fileNameIndex!!)!!
+        metaCursor.close()
 
-        Log.d("BYTES: ", bytes.toString())
-        //item?.close()
-
-        //val file = File(uri.getPath()!!)
-        //val file: DocumentFile? = DocumentFile.fromSingleUri(ctx, uri)
-        //Log.d("PATH: ", uri.getPath()!!)
-        //Log.d("FILE: ", file.toString())
-        //val fileDescriptor: AssetFileDescriptor =
-        //    getApplicationContext().getContentResolver().openAssetFileDescriptor(uri, "r")
-        //val size = fileDescriptor.getLength()
-
-
-        //val displayName = file.getName()
-        //val displayName = File(uri.path).name
-        //val displayName = file.getName()
-        //val size = file.length()
-        //val size = File(uri.path).size
-        //val size = file.length()
-        //val mimeType = file.getType()
-        //val path = file.getPath()
-
-        //val size = getFileSizeFromUri(contentResolver, uri)
-
-        stream = item!!
-        fileName = displayName!!
-        fileSize = length!!
-        filePath = path!!
-        Log.d("STREAM: ", stream.toString())
-        Log.d("FILENAME: ", fileName.toString())
-        Log.d("FILESIZE: ", fileSize.toString())
-        Log.d("FILEPATH: ", filePath.toString())
-
-
-        //item?.close()
+        appSelected = false
         appSelected = true
     }
 
@@ -210,7 +171,6 @@ fun HashFile(modifier: Modifier = Modifier) {
             FilledTonalButton(
                 modifier =  Modifier.fillMaxWidth(),
                 onClick = {
-                    // In your button's click
                     pickFileLauncher.launch("*/*")
                 }
             ) {
@@ -238,7 +198,8 @@ fun HashFile(modifier: Modifier = Modifier) {
                 horizontalArrangement = Arrangement.End
             ) {
                 FilledTonalButton(onClick = {
-                    calcHash(hashFunction, stream)
+                    uriHandler(ctx)
+                    calcHash(hashFunction, fileContent)
                     calculated = false
                     calculated = true
                 }) {
@@ -254,16 +215,31 @@ fun HashFile(modifier: Modifier = Modifier) {
 
                 ) {
                     Text(
-                        text = ("Name: ${fileName}")
+                        text = ("Name: $fileName")
                     )
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start
                 ) {
-                    Text(
-                        text = ("Size: ${fileSize}")
-                    )
+                    var byteMathStop = false
+                    var dataSize = "B"
+                    while (!byteMathStop) {
+                        if (dataSize == "GB" || fileSize < 1000) {
+                            Text(
+                                text = ("Size: $fileSize$dataSize")
+                            )
+                            byteMathStop = true
+                        } else {
+                            if (dataSize == "B") {
+                                fileSize /= 1000
+                                dataSize = "MB"
+                            } else {
+                                fileSize /= 1000
+                                dataSize = "GB"
+                            }
+                        }
+                    }
                 }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -303,7 +279,7 @@ fun HashFile(modifier: Modifier = Modifier) {
     }
 }
 
-private fun calcHash(hashFunction: TextFieldState, stream: Any) {
+private fun calcHash(hashFunction: TextFieldState, fileContent: InputStream) {
     // Set algorithm
     val setAlgo = hashFunction.text.toString()
     Log.d("setAlgo:", setAlgo)
@@ -311,8 +287,23 @@ private fun calcHash(hashFunction: TextFieldState, stream: Any) {
     Log.d("hashOpe:", hashOpe.SetAlgorithm(setAlgo).toString())
 
     // Set input stream
-    msToHash = hashOpe.FileToHash(stream as InputStream?)
+    msToHash = hashOpe.FileToHash(fileContent)
+    fileContent.close()
 
     answer = msToHash
     Log.d("answer:", answer)
+}
+
+private fun uriHandler(ctx: Context) {
+    val uri = fileUri.toString().toUri()
+    try {
+        fileContent = ctx.contentResolver.openInputStream(uri)!!
+    } catch (e: IOException) {
+        e.printStackTrace()
+    }
+
+    Log.d("URI: ", fileUri.toString())
+    Log.d("FILE-CONTENT: ", fileContent.toString())
+    Log.d("FILE-NAME: ", fileName)
+    Log.d("FILE-SIZE: ", fileSize.toString())
 }
