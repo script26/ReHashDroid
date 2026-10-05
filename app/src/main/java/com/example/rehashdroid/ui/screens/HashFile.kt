@@ -36,6 +36,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,14 +69,14 @@ private var fileUri: Uri = "".toUri()
 @Composable
 @Preview(showBackground = true)
 fun HashFile() {
-    var checked by remember { mutableStateOf(false) }
+    var checked by rememberSaveable { mutableStateOf(false) }
     val options = stringArrayResource(R.array.Algo_Array)
     val hashFunction = rememberTextFieldState(
         options[5]
     )
     var expanded by remember { mutableStateOf(false) }
-    var calculated by remember { mutableStateOf(false) }
-    var appSelected by remember { mutableStateOf(false) }
+    var calculated by rememberSaveable { mutableStateOf(false) }
+    var appSelected by rememberSaveable { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val ctx = LocalContext.current

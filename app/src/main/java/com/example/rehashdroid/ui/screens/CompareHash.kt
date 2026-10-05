@@ -45,13 +45,14 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rehashdroid.R
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.runtime.saveable.rememberSaveable
 
 
 @Composable
 @Preview(showBackground = true)
 fun CompareHash(modifier: Modifier = Modifier) {
-    var identicalHashes by remember { mutableStateOf(false) }
-    var differentHashes by remember { mutableStateOf(false) }
+    var identicalHashes by rememberSaveable { mutableStateOf(false) }
+    var differentHashes by rememberSaveable { mutableStateOf(false) }
     val firstHashState = rememberTextFieldState()
     val secondHashState = rememberTextFieldState()
 

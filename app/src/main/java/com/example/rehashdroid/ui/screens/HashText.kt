@@ -32,6 +32,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -55,7 +56,7 @@ private var msToHash = ""
 @Composable
 @Preview(showBackground = true)
 fun HashText() {
-    var checked by remember { mutableStateOf(false) }
+    var checked by rememberSaveable { mutableStateOf(false) }
     val options = stringArrayResource(R.array.Algo_Array)
     val hashFunction = rememberTextFieldState(
         options[5]
@@ -69,7 +70,7 @@ fun HashText() {
     val duration = Toast.LENGTH_SHORT
     val toast = Toast.makeText(ctx, text, duration)
     val manager = ctx.getSystemService(ClipboardManager::class.java)
-    var calculated by remember { mutableStateOf(false) }
+    var calculated by rememberSaveable { mutableStateOf(false) }
 
     Box(
         modifier = Modifier.fillMaxSize()
