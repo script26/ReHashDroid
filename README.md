@@ -1,3 +1,5 @@
+ReHashDroid BETA*
+
 Jetpack Compose and Kotlin remake of [Hash Droid](https://github.com/HobbyOneDroid/HashDroid)
 
 Check the integrity of text, files, and compare hashes.
