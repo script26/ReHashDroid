@@ -233,6 +233,9 @@ fun HashFile() {
                         } else {
                             if (dataSize == "B") {
                                 fileSize /= 1000
+                                dataSize = "KB"
+                            } else if (dataSize == "KB") {
+                                fileSize /= 1000
                                 dataSize = "MB"
                             } else {
                                 fileSize /= 1000
