@@ -34,7 +34,13 @@ fun AppNavigation() {
                 Tab(
                     selected = selectedDestination == index,
                     onClick = {
-                        navController.navigate(route = destination.route)
+                        navController.navigate(route = destination.route) {
+                            popUpTo(navController.graph.startDestinationId) {
+                                saveState = true
+                            }
+                            launchSingleTop = true
+                            restoreState = true
+                        }
                         selectedDestination = index
                     },
                     text = {
