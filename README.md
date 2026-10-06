@@ -1,4 +1,4 @@
-## ReHashDroid (Fully Working)
+## ReHashDroid
 
 APK signature (Use [AppVerifier](https://github.com/soupslurpr/AppVerifier)/[AppVerifierBG](https://github.com/RoundSalmon4/AppVerifierBG)): 
 ```
