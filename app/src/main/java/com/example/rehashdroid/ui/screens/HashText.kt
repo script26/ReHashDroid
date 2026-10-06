@@ -15,11 +15,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.clearText
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -47,6 +49,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rehashdroid.R
 import com.example.rehashdroid.logic.HashFunctionOperator
+import com.example.rehashdroid.ui.components.ProgressDialog
 
 private var answer = "testing"
 private val hashOpe = HashFunctionOperator()
@@ -62,11 +65,13 @@ fun HashText() {
         options[5]
     )
     var expanded by remember { mutableStateOf(false) }
+    var showProgress by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val inputHash = rememberTextFieldState()
     val ctx = LocalContext.current
     val text = "Saved to clipboard!"
+    val state = rememberScrollState()
     val duration = Toast.LENGTH_SHORT
     val toast = Toast.makeText(ctx, text, duration)
     val manager = ctx.getSystemService(ClipboardManager::class.java)
@@ -74,13 +79,16 @@ fun HashText() {
 
     Box(
         modifier = Modifier.fillMaxSize()
+            .verticalScroll(state)
         ,
         contentAlignment = Alignment.Center
     ) {
         Column(
             modifier = Modifier
                 .widthIn(0.dp, 400.dp)
-                .padding(20.dp),
+                .padding(20.dp)
+                .verticalScroll(state)
+            ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
@@ -143,6 +151,7 @@ fun HashText() {
                 state = inputHash,
                 modifier =  Modifier.fillMaxWidth(),
                 label = { Text("Input hash") },
+                lineLimits = TextFieldLineLimits.SingleLine
             )
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -162,6 +171,7 @@ fun HashText() {
                 horizontalArrangement = Arrangement.End
             ) {
                 FilledTonalButton(onClick = {
+                    showProgress = true
                     calcHash(hashFunction, inputHash)
                     calculated = false
                     calculated = true
@@ -178,8 +188,13 @@ fun HashText() {
                 }
             }
 
+            if (showProgress) {
+                ProgressDialog(onDismissRequest = {showProgress = true})
+            }
+
             // Answer and copy hash button
             if (calculated) {
+                showProgress = false
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start

@@ -1,5 +1,6 @@
 package com.example.rehashdroid.ui.screens
 
+import android.R.attr.delay
 import android.content.ClipData
 import android.content.ClipboardManager
 import android.content.Context
@@ -10,21 +11,30 @@ import android.util.Log
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldLineLimits
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.text.input.rememberTextFieldState
 import androidx.compose.foundation.text.input.setTextAndPlaceCursorAtEnd
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExposedDropdownMenuBox
@@ -33,6 +43,8 @@ import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -43,15 +55,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.focus.onFocusChanged
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import androidx.core.net.toUri
 import com.example.rehashdroid.R
 import com.example.rehashdroid.logic.HashFunctionOperator
+import com.example.rehashdroid.ui.components.ProgressDialog
+import org.intellij.lang.annotations.JdkConstants
 import java.io.ByteArrayInputStream
 import java.io.IOException
 import java.io.InputStream
@@ -77,11 +97,13 @@ fun HashFile() {
     var expanded by remember { mutableStateOf(false) }
     var calculated by rememberSaveable { mutableStateOf(false) }
     var appSelected by rememberSaveable { mutableStateOf(false) }
+    var showProgress by remember { mutableStateOf(false) }
     val focusRequester = remember { FocusRequester() }
     val focusManager = LocalFocusManager.current
     val ctx = LocalContext.current
     val text = "Saved to clipboard!"
     val duration = Toast.LENGTH_SHORT
+    val state = rememberScrollState()
     val toast = Toast.makeText(ctx, text, duration)
     val manager = ctx.getSystemService(ClipboardManager::class.java)
     val pickFileLauncher = rememberLauncherForActivityResult(
@@ -106,6 +128,7 @@ fun HashFile() {
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(state)
         ,
         contentAlignment = Alignment.Center
     ) {
@@ -200,6 +223,7 @@ fun HashFile() {
             ) {
                 FilledTonalButton(onClick = {
                     uriHandler(ctx)
+                    showProgress = true
                     calcHash(hashFunction, fileContent)
                     calculated = false
                     calculated = true
@@ -208,8 +232,13 @@ fun HashFile() {
                 }
             }
 
+            if (showProgress) {
+                ProgressDialog(onDismissRequest = {showProgress = true})
+            }
+
             // Answer text
             if (calculated) {
+                showProgress = false
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.Start

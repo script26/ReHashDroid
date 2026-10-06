@@ -45,7 +45,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.rehashdroid.R
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.saveable.rememberSaveable
+import com.example.rehashdroid.ui.components.ProgressDialog
 
 
 @Composable
@@ -53,12 +56,15 @@ import androidx.compose.runtime.saveable.rememberSaveable
 fun CompareHash(modifier: Modifier = Modifier) {
     var identicalHashes by rememberSaveable { mutableStateOf(false) }
     var differentHashes by rememberSaveable { mutableStateOf(false) }
+    var showProgress by remember { mutableStateOf(false) }
     val firstHashState = rememberTextFieldState()
     val secondHashState = rememberTextFieldState()
+    val state = rememberScrollState()
 
     Box(
         modifier = Modifier
             .fillMaxSize()
+            .verticalScroll(state)
         ,
         contentAlignment = Alignment.Center
     ) {
@@ -126,6 +132,7 @@ fun CompareHash(modifier: Modifier = Modifier) {
             FilledTonalButton(
                 modifier =  Modifier.fillMaxWidth(),
                 onClick = {
+                    showProgress = true
                     Log.d("TAG", firstHashState.text.toString())
                     if (firstHashState.text == secondHashState.text) {
                         differentHashes = false
@@ -141,12 +148,17 @@ fun CompareHash(modifier: Modifier = Modifier) {
                 Text(text = stringResource(R.string.compare_but))
             }
 
+            if (showProgress) {
+                ProgressDialog(onDismissRequest = {showProgress = true})
+            }
+
             // Answer
             Row(
                 modifier =  Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.Center
             ) {
                 if (identicalHashes) {
+                    showProgress = false
                     Log.d("TAG", "identical text")
                     Text(
                         stringResource(R.string.IdenticalHashes),
@@ -155,6 +167,7 @@ fun CompareHash(modifier: Modifier = Modifier) {
                     )
                 }
                 if (differentHashes) {
+                    showProgress = false
                     Log.d("TAG", "different text")
                     Text(
                         stringResource(R.string.DifferentHashes),
