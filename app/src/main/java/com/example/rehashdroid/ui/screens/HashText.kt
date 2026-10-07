@@ -78,7 +78,8 @@ fun HashText() {
     var calculated by rememberSaveable { mutableStateOf(false) }
 
     Box(
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
             .verticalScroll(state)
         ,
         contentAlignment = Alignment.Center
@@ -87,7 +88,6 @@ fun HashText() {
             modifier = Modifier
                 .widthIn(0.dp, 400.dp)
                 .padding(20.dp)
-                .verticalScroll(state)
             ,
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally,
